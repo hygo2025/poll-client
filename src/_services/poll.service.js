@@ -2,12 +2,13 @@ import { authHeader } from '../_helpers'
 import { baseUrl } from '../_utils/vars'
 import { handleResponse } from '../_helpers'
 
-const createPoll = (title, fields, id) => {
+const createPoll = (title, loginRequired, fields, id) => {
   const requestOptions = {
     method: id ? 'PATCH' : 'POST',
     headers: { ...authHeader(), 'Content-Type': 'application/json' },
     body: JSON.stringify({
       title: title,
+      loginRequired: loginRequired,
       options: (fields || []).map(s => s.value),
     }),
   }
@@ -20,16 +21,20 @@ const createPoll = (title, fields, id) => {
     })
 }
 
-const answerPoll = (pollId, answerId) => {
+const answerPoll = (pollId, answerId, actualAnswer) => {
   const requestOptions = {
-    method: 'POST',
+    method: actualAnswer ? 'PATCH' : 'POST',
     headers: { ...authHeader(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: answerId,
+    }),
   }
 
-  return fetch(
-    `${baseUrl}/public/polls/${pollId}/answers/${answerId}`,
-    requestOptions,
-  )
+  const url = actualAnswer
+    ? `${baseUrl}/public/polls/${pollId}/answers/${actualAnswer}`
+    : `${baseUrl}/public/polls/${pollId}/answers`
+
+  return fetch(url, requestOptions)
     .then(handleResponse)
     .then(answer => {
       return answer
@@ -99,11 +104,27 @@ const associate = ids => {
       pollIds: ids,
     }),
   }
-  debugger
   return fetch(`${baseUrl}/polls/associate`, requestOptions)
     .then(handleResponse)
     .then(polls => {
       return polls
+    })
+}
+
+const getAnswer = (pollId, answerId) => {
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    headers: { ...authHeader(), 'Content-Type': 'application/json' },
+  }
+
+  return fetch(
+    `${baseUrl}/public/polls/${pollId}/answers/${answerId}`,
+    requestOptions,
+  )
+    .then(handleResponse)
+    .then(answer => {
+      return answer
     })
 }
 
@@ -115,4 +136,5 @@ export const pollService = {
   associate,
   getAll,
   graph,
+  getAnswer,
 }

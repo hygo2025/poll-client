@@ -3,11 +3,11 @@ import { history } from '../_helpers'
 import { pollConstants } from '../_constants'
 import { pollService } from '../_services'
 
-const createPoll = (title, fields, id) => {
+const createPoll = (title, loginRequired = false, fields, id) => {
   return dispatch => {
     dispatch(request())
 
-    pollService.createPoll(title, fields, id).then(
+    pollService.createPoll(title, loginRequired, fields, id).then(
       poll => {
         dispatch(success(poll))
         dispatch(alertActions.success('poll created successfully'))
@@ -30,11 +30,11 @@ const createPoll = (title, fields, id) => {
   }
 }
 
-const answerPoll = (pollId, answerId) => {
+const answerPoll = (pollId, answerId, actualAnswer) => {
   return dispatch => {
     dispatch(request())
 
-    pollService.answerPoll(pollId, answerId).then(
+    pollService.answerPoll(pollId, answerId, actualAnswer).then(
       answer => {
         dispatch(success(answer))
         dispatch(alertActions.success('answers created successfully'))
@@ -188,6 +188,32 @@ const graph = () => {
   }
 }
 
+const getAnswer = (pollId, answerId) => {
+  return dispatch => {
+    dispatch(request())
+
+    pollService.getAnswer(pollId, answerId).then(
+      answer => {
+        dispatch(success(answer))
+      },
+      error => {
+        dispatch(failure(error.toString()))
+        dispatch(alertActions.error(error.toString()))
+      },
+    )
+  }
+
+  function request(answer) {
+    return { type: pollConstants.GET_ANSWER_REQUEST, answer }
+  }
+  function success(answer) {
+    return { type: pollConstants.GET_ANSWER_SUCCESS, answer }
+  }
+  function failure(error) {
+    return { type: pollConstants.GET_ANSWER_FAILURE, error }
+  }
+}
+
 export const pollActions = {
   createPoll,
   getPoll,
@@ -197,4 +223,5 @@ export const pollActions = {
   associate,
   getAll,
   graph,
+  getAnswer,
 }

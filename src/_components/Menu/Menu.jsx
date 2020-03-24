@@ -48,17 +48,17 @@ export const Menu = () => {
             Poll
           </Link>
         </Typography>
+        <Button
+          onClick={() => {
+            history.push('/polls')
+          }}
+          color="inherit"
+        >
+          Create Poll
+        </Button>
+
         {localStorage.getItem('user') && (
           <>
-            <Button
-              onClick={() => {
-                history.push('/polls')
-              }}
-              color="inherit"
-            >
-              Create Poll
-            </Button>
-
             <Button
               onClick={() => {
                 dispatch(userActions.logout())

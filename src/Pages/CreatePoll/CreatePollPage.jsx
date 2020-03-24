@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import AddIcon from '@material-ui/icons/Add'
+import Checkbox from '@material-ui/core/Checkbox'
 import ClearIcon from '@material-ui/icons/Clear'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import FormControl from '@material-ui/core/FormControl'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import IconButton from '@material-ui/core/IconButton'
 import { Link } from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import { pollActions } from '../../_actions'
+import { useParams } from 'react-router'
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -18,7 +21,9 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const CreatePollPage = () => {
+  const { id } = useParams()
   const [title, setTitle] = useState('')
+  const [loginRequired, setLoginRequired] = useState(false)
   const user = useSelector(state => state.authentication.user)
   const [editPoll, setEditPoll] = useState(false)
   const [copied, setCopy] = useState(false)
@@ -31,10 +36,15 @@ const CreatePollPage = () => {
   const items = useSelector(state => state.poll.items)
   const dispatch = useDispatch()
 
+  useEffect(() => {
+    if (id) dispatch(pollActions.getPoll(id))
+  }, [])
+
   if (items && !fields.length > 0) {
     setTitle(items.title)
+    setEditPoll(true)
     setFields(
-      items.options.map(s => {
+      (items.options || items.pollOptions).map(s => {
         return { value: s.value }
       }),
     )
@@ -64,7 +74,9 @@ const CreatePollPage = () => {
     setEditPoll(false)
     setSubmitted(true)
     if (title && fields) {
-      dispatch(pollActions.createPoll(title, fields, (items || {}).id))
+      dispatch(
+        pollActions.createPoll(title, loginRequired, fields, (items || {}).id),
+      )
     }
   }
 
@@ -90,14 +102,14 @@ const CreatePollPage = () => {
             </button>
 
             <CopyToClipboard
-              text={`http://localhost:8080/${items.id}`}
+              text={`http://localhost:8080/polls/${items.id}/answer`}
               onCopy={() => setCopy(true)}
             >
               <button
                 className="btn btn-primary"
                 style={{ marginRight: '5px' }}
               >
-                Copy
+                Share
               </button>
             </CopyToClipboard>
 
@@ -200,6 +212,17 @@ const CreatePollPage = () => {
               })}
             </>
 
+            <div className="form-group">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={() => setLoginRequired(!loginRequired)}
+                    name="loginRequired"
+                  />
+                }
+                label="Login required"
+              />
+            </div>
             <div className="form-group">
               <button className="btn btn-primary">
                 {loading && (

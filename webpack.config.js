@@ -2,6 +2,9 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'development',
+  output: {
+    publicPath: '/',
+  },
   devtool: 'eval-source-map',
   resolve: {
     extensions: ['.js', '.jsx'],

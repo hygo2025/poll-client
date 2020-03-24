@@ -8,6 +8,7 @@ import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import ReactLoading from 'react-loading'
 import Typography from '@material-ui/core/Typography'
+import { history } from '../../_helpers'
 import { makeStyles } from '@material-ui/core/styles'
 import { pollActions } from '../../_actions'
 
@@ -27,40 +28,44 @@ const useStyles = makeStyles(() => ({
 }))
 
 const AnswerPollPage = () => {
-  const { id } = useParams()
-  const [answerId, setAnswer] = useState('')
+  const { id, answerId } = useParams()
+  const [optionsId, setOption] = useState('')
 
   const classes = useStyles()
 
   const loading = useSelector(state => state.poll.loading)
   const items = useSelector(state => state.poll.items)
   const answer = useSelector(state => state.poll.answer)
+  const actualAnswer = useSelector(state => state.poll.actualAnswer)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(pollActions.getPoll(id))
+    if (id) dispatch(pollActions.getPoll(id))
+    if (id && answerId) dispatch(pollActions.getAnswer(id, answerId))
   }, [])
 
   function handleChange(i, event) {
-    setAnswer(event)
+    setOption(event)
   }
 
   function handleSubmit(e) {
     e.preventDefault()
 
-    if (answerId) {
-      dispatch(pollActions.answerPoll(items.id, answerId))
+    if (optionsId) {
+      dispatch(
+        pollActions.answerPoll(items.id, optionsId, (actualAnswer || {}).id),
+      )
     }
   }
 
-  function clearAnswer() {
+  function editAnswer() {
     dispatch(pollActions.clearAnswer())
+    history.push(`/polls/${items.id}/answer/${answer.id}`)
   }
 
   function searchAnswerValue(answer) {
-    const value = (
+    const value =
       items.pollOptions.filter(s => s.id === answer.optionId)[0] || {}
-    ).value
     return value
   }
 
@@ -76,11 +81,11 @@ const AnswerPollPage = () => {
         <>
           <FormControl component="fieldset">
             <Typography variant="h4" component="h2">
-              Your answer: {searchAnswerValue(answer)}
+              Your answer: {searchAnswerValue(answer).value} - id: {answer.id}
             </Typography>
           </FormControl>
           <div className="form-group">
-            <button className="btn btn-primary" onClick={() => clearAnswer()}>
+            <button className="btn btn-primary" onClick={() => editAnswer()}>
               {loading && (
                 <span className="spinner-border spinner-border-sm mr-1"></span>
               )}
@@ -112,6 +117,9 @@ const AnswerPollPage = () => {
                       <div className="col-lg-10">
                         <FormControlLabel
                           value={field.id}
+                          defaultChecked={
+                            field.id === (actualAnswer || {}).optionId
+                          }
                           control={<Radio />}
                           label={field.value}
                         />

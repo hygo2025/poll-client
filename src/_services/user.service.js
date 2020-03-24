@@ -72,7 +72,6 @@ function register(user) {
     body: JSON.stringify(user),
   }
 
-  debugger
   return fetch(`${baseUrl}/users`, requestOptions)
     .then(handleResponse)
     .then(user => {

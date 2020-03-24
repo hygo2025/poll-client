@@ -49,7 +49,6 @@ export function poll(state = {}, action) {
         loading: true,
       }
     case pollConstants.GET_ALL_POLL_SUCCESS:
-      debugger
       return {
         ...state,
         myPolls: action.polls,
@@ -92,7 +91,6 @@ export function poll(state = {}, action) {
         loading: false,
       }
     case pollConstants.GET_POLL_FAILURE:
-      //TODO REDIRECIONAR PARA UMA PAGINA 404
       return {
         ...state,
         error: action.error,
@@ -115,6 +113,25 @@ export function poll(state = {}, action) {
         error: action.error,
         loading: false,
       }
+
+    case pollConstants.GET_ANSWER_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      }
+    case pollConstants.GET_ANSWER_SUCCESS:
+      return {
+        ...state,
+        actualAnswer: action.answer,
+        loading: false,
+      }
+    case pollConstants.GET_ANSWER_FAILURE:
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
+      }
+
     case pollConstants.CLEAR_ANSWER:
       return {
         ...state,

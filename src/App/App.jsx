@@ -35,10 +35,19 @@ function App() {
             <Switch>
               <PrivateRoute exact path="/" component={HomePage} />
               <Route path="/login" component={LoginPage} />
-              <Route path="/polls" component={CreatePollPage} />
               <Route path="/register" component={RegisterPage} />
-              {/* TODO FIX THIS ROUTE */}
-              <Route exact path="/:id" component={AnswerPollPage} />
+              <Route exact path="/polls" component={CreatePollPage} />
+              <Route
+                exact
+                path="/polls/:id/answer"
+                component={AnswerPollPage}
+              />
+              <Route
+                exact
+                path="/polls/:id/answer/:answerId"
+                component={AnswerPollPage}
+              />
+              <Route exact path="/polls/:id" component={CreatePollPage} />
               <Redirect from="*" to="/" />
             </Switch>
           </div>
