@@ -102,7 +102,7 @@ const CreatePollPage = () => {
             </button>
 
             <CopyToClipboard
-              text={`http://localhost:8080/polls/${items.id}/answer`}
+              text={`http://0.0.0.0:8000/polls/${items.id}/answer`}
               onCopy={() => setCopy(true)}
             >
               <button
