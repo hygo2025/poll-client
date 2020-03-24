@@ -1,0 +1,5 @@
+{
+  "standard.enable": false,
+  "editor.formatOnSave": true,
+  "jest.pathToJest": "yarn test:unit"
+}
